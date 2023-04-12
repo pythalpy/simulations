@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
 
+""" tutorial: Blockchain Data Analytics, for Dummies"""
+
 k = [2,3,4,5,6,7,8]
 
 X, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=0)

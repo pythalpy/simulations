@@ -1,74 +1,51 @@
-# This is a project designed to combine my practical
-# knowledge in mechanical engineering, with the software engineering 
-# experience I've gathered so far and continue to learn about
-# I don't think I've learned any new things in mech-e theory in a while
-# as my focus has been heavily in the swe side. However, I should
-# remind myself that I have amassed a wealth of practical production
-# and design skills with 3D printing and CAD, and that I've read a handful of
-# journals/publications in this space as well 
-
-# Now I have a great opportunity and more accurately a necessity to 
-# combine these skillsets and build something really cool alhamdulillah, I could have
-# been doing this all along, and it may have accelerated my growth, as it
-# did when I started working on simulations back when covid first hit.
-# However, as my favorite saying goes, the best time is now.
-
-# Mechanical Theory Topics
-# - Thermal and material properties
-# - Vector Dynamics and motion
-# - System Dynamics, oscillatioms, damping, harmonics
-# - Stress/Strain material stress
-# - Heat transfer and phase change
-
-# Software Development Topics
-# - Object-Oriented Class Structure
-# -- Classes, Libraries, Modules, Methods
-# - Collaborative development via git
-# - Optimized Algorithm Complexity
-# - Passing data across multiple layers
-# -- Application Layer, Framework Layer, Memory Layer
-# - Unit Testing and Integration Testing
-
-# Let's start with something really simple, like boiling water, which is actually
-# a complex phenomenon
+import substances
 
 
-class substances:
-    
+# Unit Converters
+def F2C(temp_Fahrenheit):
+    temp_Celsius = 5/9*(temp_Fahrenheit - 32)  # (5/9) * (degF - 32) = C
+    return temp_Celsius
 
 
-def water():
-    mass = 1 # kg
-    temp_initial = 0 # C
-    specific_heat = 4186 # kJ/(kg K)
-    return mass, temp_initial, specific_heat
+def cup2L(volume_cups):
+    volume_L = volume_cups/4.22675  # (cups) * (1 L / 4.22675 cups) = L
+    return volume_L
 
-water_state = [0,0,0]
-water_state[0], water_state[1], water_state[2] = water()
 
-print('Initial State')
-print(f'Water Mass: {water_state[0]}, Water Temp: {water_state[1]}')
+water = substances.Water()  # Instantiate substance class object
+water.temp = F2C(55)        # Set Initial Temperature in F (converted to C)
+water.volume = cup2L(0.5)   # Set Volume in cups (converted to L)
 
-def heater(substance,temp, duration): 
-    # at first just add temp
-    # next, add Joules or Watts of heat
-    #substance[1] += 20 #adds 20C of temp
+milk = substances.Milk()
+milk.temp = F2C(55)
+milk.volume = cup2L(0.5)
 
-    requested_temp_increase=temp
-    heat_required=substance[2]*substance[0]*requested_temp_increase
-    substance[1] += 20
-    power=heat_required/duration
-    return substance, heat_required, power
+print('-% start of run %-')
+print(f'Initial State: Water Mass: {round(water.mass,3)} kg, Water Temp: {round(water.temp, 2)} C' )
+print(f'Initial State: Milk Mass: {round(milk.mass, 3)} kg, Milk Temp: {round(milk.temp, 2)} C' )
 
-for i in range(4):
-    if water_state[1] >100:
-        print('The water has boiled!')
-        break
-    water_state,heatreq,powerreq=heater(water_state,20, 10)
-    print('Intermediate State')
-    print(f'Water Mass: {water_state[0]}, Water Temp: {water_state[1]}')
 
-print(f'Heat required: {heatreq} kJ')
-print(f'Power required: {powerreq} kW')
-print(f'Cost: ${heatreq*0.38/3600}')
-print('end of run')
+def heater(substance,target_temp):
+    required_temp_increase = target_temp - substance.temp
+    heat_required = substance.specificHeat * substance.mass * required_temp_increase
+    if target_temp > substance.liquid_vapor_temp:
+        heat_required += substance.heat_of_vaporization
+
+    print(f'delta-T: {round(required_temp_increase, 2)} C')
+    return heat_required
+
+
+heatreq_water = heater(water, 104)
+heatreq_milk = heater(water, 99.7)
+utilcost = 0.38
+energy_cost = utilcost*(heatreq_water + heatreq_milk)/3600
+energy_cost = "${:,.2f}".format(energy_cost)
+
+
+print(f'Heat required: {round((heatreq_water + heatreq_milk),2)} kJ')
+print(f'Heat required: {round((heatreq_water + heatreq_milk)/3600,2)} kilowatt-hour')
+# print(f'Power required: {powerreq} kW')
+print(f'Cost at ${utilcost}/kW-hr: {energy_cost}')
+print('-% end of run %-')
+
+
